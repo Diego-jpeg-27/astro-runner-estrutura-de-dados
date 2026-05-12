@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASTRO RUNNER</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<div id="space-bg"></div>
+<audio id="audio-game1" src="game1.mp3" loop preload="auto"></audio>
+<audio id="audio-game2" src="game2.mp3" loop preload="auto"></audio>
+<div id="fx-explosion" class="fx-overlay"></div>
+
+<div id="fx-blackhole" class="fx-overlay" style="flex-direction:column;gap:1.5rem;background:rgba(0,0,0,.96);">
+  <div class="bh-container">
+    <div class="bh-ring" style="width:280px;height:280px;background:conic-gradient(from 0deg,transparent,#9b59b666,transparent,#6c3483aa,transparent);--dur:1.8s;"></div>
+    <div class="bh-ring" style="width:200px;height:200px;background:conic-gradient(from 180deg,transparent,#4a235a99,transparent);--dur:2.8s;animation-direction:reverse;"></div>
+    <div class="bh-ring" style="width:130px;height:130px;background:conic-gradient(from 90deg,transparent,#9b59b644,transparent);--dur:1.2s;"></div>
+    <div class="bh-core"></div>
+    <div class="bh-card-suck" id="bh-suck-card"></div>
+  </div>
+  <div class="bh-text" id="bh-text">GRAVIDADE IRRESISTÍVEL...</div>
+</div>
+
+<div id="fx-turbo" class="fx-overlay" style="background:#00000088;pointer-events:none;">
+  <div class="turbo-glow"><div id="turbo-inner"></div></div>
+</div>
+
+<div id="fx-chest" class="fx-overlay" style="background:#00000099;">
+  <div class="chest-modal">
+    <div class="chest-title">BAÚ</div>
+    <div class="chest-sub">Girando a roleta de recompensas...</div>
+    <div class="roulette-wrap">
+      <div class="roulette-strip" id="roulette-strip"></div>
+      <div class="roulette-pointer">▲</div>
+    </div>
+    <div class="chest-result" id="chest-result"></div>
+  </div>
+</div>
+
+<div id="msg-popup"></div>
+<div id="g2-msg" class="g2-msg-popup"></div>
+
+<div id="app">
+
+  <div class="screen active" id="screen-menu"
+       style="flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:1rem;padding-top:0;">
+
+    <div style="font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.25em;color:#4fc3f7;text-shadow:0 0 4px #4fc3f7;">
+      IFPE · ALGORITMOS E ESTRUTURAS DE DADOS
+    </div>
+
+    <div class="logo">ASTRO RUNNER</div>
+    <div class="logo-sub">FUGA NA ESTAÇÃO EM COLAPSO</div>
+
+    <div class="menu-float" style="margin:.6rem 0;">
+      <div class="dossier-card mini" style="pointer-events:none;">
+        <div class="dossier-watermark">TOP SECRET</div>
+        <div class="dossier-avatar-frame">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <img id="menu-astro-preview" src="astronauta.jpeg" onerror="this.src='https://via.placeholder.com/150'"
+           style="width:100%;height:100%;object-fit:cover;border-radius:4px;" />
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="flex-direction:column;gap:.7rem;">
+      <button class="btn large gold" onclick="showScreen('screen-setup')">NOVO JOGO</button>
+      <button class="btn" onclick="showScreen('screen-rank')">RANKING</button>
+    </div>
+  </div>
+
+  <div id="screen-setup" class="screen">
+    <div class="setup-layout">
+      
+      <div class="setup-preview-col">
+        <div class="dossier-card-purple" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+          <div class="dossier-avatar-frame-purple" style="flex: 1; min-height: 280px; margin-bottom: 0;">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <img id="avatar-preview" src="avatar/space/prata.png" alt="Preview" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <div class="dossier-name-purple" style="font-size: 1.1rem; padding: 15px 0;">PERFIL DO PILOTO</div>
+        </div>
+      </div>
+
+      <div class="setup-options-col">
+        
+        <div class="setup-section">
+          <h3 class="section-title">IDENTIFICAÇÃO DO PILOTO</h3>
+          <div class="name-box">
+            <input type="text" id="player-name" placeholder="DIGITE SEU NICK..." maxlength="12">
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <h3 class="section-title">SISTEMA DE CAPACETE</h3>
+          <div id="helmet-grid" class="helmet-grid">
+            </div>
+        </div>
+
+        <div class="setup-section">
+          <h3 class="section-title">ESQUEMA DE CORES</h3>
+          <div id="color-row" class="color-row">
+            </div>
+        </div>
+
+        <div class="setup-section">
+          <h3 class="section-title">NÍVEL DE DIFICULDADE</h3>
+          <div class="difficulty-row">
+            <div class="diff-opt selected" data-diff="easy">RECRUTA</div>
+            <div class="diff-opt" data-diff="medium">VETERANO</div>
+            <div class="diff-opt" data-diff="hard">ELITE</div>
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <h3 class="section-title">MODO DE JOGO</h3>
+          <div class="difficulty-row">
+            <div class="diff-opt selected" id="mode-opt-1" onclick="selectMode(1)">Modo (Estratégia)</div>
+            <div class="diff-opt" id="mode-opt-2" onclick="selectMode(2)">Modo (Fuga)</div>
+          </div>
+        </div>
+
+        <div class="setup-footer">
+          <button class="btn-start" id="btn-start-mission" onclick="startSelectedMode()">INICIAR MISSÃO</button>
+          <button class="btn" style="width:100%; margin-top:10px; background: rgba(255, 23, 68, 0.2); border-color: var(--glow-red);" onclick="showScreen('screen-menu')">VOLTAR</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="screen" id="screen-game">
+    <div id="panel-left">
+      <div id="game-card-wrap" style="position:relative;">
+        <div class="dossier-card" id="game-card">
+          <div class="dossier-watermark">CLASSIFIED</div>
+          <div class="dossier-avatar-frame">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <div id="game-astronaut"></div>
+          </div>
+        </div>
+        <div id="game-shield-badge" class="dossier-shield" style="display:none;"><span>🛡</span></div>
+      </div>
+
+      <div class="action-btns" style="margin-top:.8rem;">
+        <button class="act-btn jump"   onclick="doAction('jump')">↑ SALTAR<span class="key-hint">ESPAÇO</span></button>
+        <button class="act-btn double" onclick="doAction('double')">↑↑ SALTO DUPLO<span class="key-hint">D</span></button>
+        <button class="act-btn super"  onclick="doAction('super')">⚡ SUPER PULO<span class="key-hint">S</span></button>
+        <button class="act-btn quit"   onclick="doQuit()">✕ ENCERRAR<span class="key-hint">Q</span></button>
+      </div>
+    </div>
+
+    <div id="panel-queue">
+      <div class="queue-title">◈ FILA DE MÓDULOS ◈</div>
+      <div id="module-queue"></div>
+    </div>
+
+    <div id="panel-right">
+      <div class="hud-box">
+        <div class="section-label">STATUS</div>
+        <div class="hud-row"><span class="hud-row-label">MÓDULOS</span><span class="hud-row-val" id="hud-modules">0</span></div>
+        <div class="hud-row"><span class="hud-row-label">TEMPO</span><span class="hud-row-val" id="hud-time">0s</span></div>
+        <div class="hud-row"><span class="hud-row-label">EVITADOS</span><span class="hud-row-val" id="hud-avoided">0</span></div>
+        <div class="hud-row"><span class="hud-row-label">SALTOS</span><span class="hud-row-val" id="hud-jumps">0</span></div>
+        <div class="hud-row"><span class="hud-row-label">SUPER</span><span class="hud-row-val" id="hud-super">0</span></div>
+      </div>
+      <div class="hud-box timer-wrap">
+        <div class="section-label" style="text-align:center;">TEMPO PARA PULAR</div>
+        <div style="display:flex;justify-content:center;">
+          <div class="ring-host">
+            <svg width="82" height="82" viewBox="0 0 82 82">
+              <circle class="ring-bg" cx="41" cy="41" r="25"/>
+              <circle class="ring-fill" id="ring-fill" cx="41" cy="41" r="25" stroke-dasharray="157" stroke-dashoffset="0"/>
+            </svg>
+            <span class="timer-center" id="timer-num">10</span>
+          </div>
+        </div>
+      </div>
+      <div class="hud-box" style="font-size:.62rem;line-height:1.9;color:#5a6899;letter-spacing:.04em;">
+        <div id="hud-diff" style="font-family:'Orbitron',monospace;font-size:.52rem;color:#4fc3f7;margin-bottom:.4rem;">DIFIC.: FÁCIL</div>
+        <div id="hud-shield">🛡 INATIVO</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-game2"
+       style="flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:1.2rem 1rem 1rem;">
+    <div style="width:100%;max-width:1200px;position:relative;">
+      <canvas id="canvas-game2" style="display:block;width:100%;border-radius:8px;box-shadow:0 0 28px #4fc3f733;"></canvas>
+      <div style="display:flex;align-items:center;justify-content:center;gap:.8rem;margin-top:.6rem;flex-wrap:wrap;">
+        <div style="font-family:'Orbitron',monospace;font-size:.55rem;color:#1a3a6a;letter-spacing:.08em;">
+          ← A / D → MOVER &nbsp;·&nbsp; ESPAÇO PULAR &nbsp;·&nbsp; P PAUSAR
+        </div>
+        <button class="act-btn jump" style="padding:.3rem .8rem;font-size:.6rem;" onclick="tryJump2()">↑ PULAR</button>
+        <button class="act-btn double" id="btn-g2-pause" style="padding:.3rem .8rem;font-size:.6rem;">⏸ PAUSAR</button>
+        <button class="act-btn quit" id="btn-g2-quit" style="padding:.3rem .8rem;font-size:.6rem;">✕ SAIR</button>
+      </div>
+    </div>
+    <!-- OVERLAY DA ROLETA DO BAÚ (MODO 2) -->
+<div id="chest-overlay" class="chest-hidden">
+  <div class="chest-modal-container">
+    <div class="chest-header">
+      <div class="chest-title-glow">📦 BAÚ ESPACIAL</div>
+    </div>
+    <div class="chest-roulette-area">
+      <div class="chest-nebula-bg"></div>
+      <div class="chest-fade-overlay"></div>
+      <div class="chest-pointer">
+        <div class="chest-pointer-arrow-up">▼</div>
+        <div class="chest-pointer-line"></div>
+        <div class="chest-pointer-arrow-down">▲</div>
+      </div>
+      <div id="chest-track" class="chest-track"></div>
+    </div>
+    <div class="chest-result-area">
+      <div id="chest-result-text" class="chest-result-text"></div>
+    </div>
+    <button id="chest-btn-claim" class="chest-btn" disabled>RECEBER PRÊMIO</button>
+  </div>
+</div>
+  </div>
+
+  <div class="screen" id="screen-end" style="flex-direction:column;align-items:center;min-height:100vh;padding-top:2rem;gap:1.4rem;">
+    <div class="logo" style="font-size:1.9rem;" id="end-title">💀 GAME OVER</div>
+    <div id="end-reason" style="font-size:.7rem;color:#5a6899;letter-spacing:.14em;"></div>
+    <div class="section-label">ESTATÍSTICAS DA PARTIDA</div>
+    <div class="stats-grid" id="end-stats"></div>
+    <div class="section-label">PERCURSO — Lista Encadeada</div>
+    <div class="history-scroll" id="end-history"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="showScreen('screen-rank')">RANKING</button>
+      <button class="btn gold" onclick="showScreen('screen-setup')">JOGAR NOVAMENTE</button>
+      <button class="btn red" onclick="showScreen('screen-menu')">MENU</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-game2-end" style="flex-direction:column;align-items:center;min-height:100vh;padding-top:2rem;gap:1.4rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.2em;color:#ff9f43;border:1px solid #ff9f4344;padding:.25rem .9rem;border-radius:4px;">
+      MODO 2 · PLATAFORMA
+    </div>
+    <div class="logo" style="font-size:1.9rem;" id="g2-end-title">💀 GAME OVER</div>
+    <div id="g2-end-reason" style="font-size:.7rem;color:#5a6899;letter-spacing:.14em;"></div>
+    <div class="section-label">ESTATÍSTICAS DA PARTIDA</div>
+    <div class="stats-grid" id="g2-end-stats"></div>
+    <div class="section-label">ITENS COLETADOS — Lista Encadeada</div>
+    <div class="history-scroll" id="g2-end-history"></div>
+    <div class="btn-row">
+      <button class="btn" id="g2-btn-rank">RANKING</button>
+      <button class="btn gold" id="g2-btn-replay">JOGAR NOVAMENTE</button>
+      <button class="btn red" id="g2-btn-menu">MENU</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-rank" style="flex-direction:column;align-items:center;min-height:100vh;padding-top:2rem;gap:1.4rem;">
+    <div class="logo" style="font-size:1.9rem;">🏆 RANKING</div>
+    <table class="rank-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>JOGADOR</th>
+          <th>MÓDULOS</th>
+          <th>TEMPO</th>
+          <th>DIFICULDADE</th>
+          <th>MODO</th>
+        </tr>
+      </thead>
+      <tbody id="rank-body"></tbody>
+    </table>
+    <div class="btn-row">
+      <button class="btn" onclick="showScreen('screen-menu')">VOLTAR</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="images.js"></script>
+<script src="game.js"></script>
+<script src="game2.js"></script>
+
+<script>
+'use strict';
+
+/* ── estado do modo selecionado ── */
+let selectedMode = 1;
+
+/* ── seleção visual do modo ── */
+function selectMode(mode) {
+  selectedMode = mode;
+  document.getElementById('mode-opt-1').classList.toggle('selected', mode === 1);
+  document.getElementById('mode-opt-2').classList.toggle('selected', mode === 2);
+
+  const btn = document.getElementById('btn-start-mission');
+  if (mode === 2) {
+    btn.textContent = ' INICIAR MISSÃO';
+    btn.style.cssText = `background:linear-gradient(135deg,#ff9f43,#ff6d00); box-shadow:0 0 18px #ff9f4355;color:#000;`;
+  } else {
+    btn.textContent = ' INICIAR MISSÃO';
+    btn.style.cssText = '';
+  }
+}
+
+/* ── dispara o modo correto ── */
+function startSelectedMode() {
+  /* Coleta configurações do jogador da interface nova */
+  player.name       = (document.getElementById('player-name').value.trim() || 'ASTRO-01').toUpperCase();
+  player.difficulty = document.querySelector('.diff-opt.selected')?.dataset.diff || 'easy';
+  
+  /* As variáveis player.color e player.helmet são atualizadas em tempo real pelo game.js (changeColor/changeHelmet) */
+
+  if (selectedMode === 2) {
+    document.getElementById('screen-setup').classList.remove('active');
+    initMode2();
+  } else {
+    document.getElementById('screen-setup').classList.remove('active');
+    startGame();
+  }
+}
+
+/* ── buildRanking estendido (com coluna MODO) ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const origBuildRanking = buildRanking;
+  buildRanking = function () {
+    const tbody = document.getElementById('rank-body');
+    if (!ranking.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#12264a;padding:2rem;font-size:.75rem;">Nenhuma partida registrada ainda</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = ranking.slice(0, 10).map((r, i) => `
+      <tr class="${r.name === player.name ? 'me' : ''}">
+        <td class="rank-num">#${i + 1}</td>
+        <td>
+          <span class="rank-dot" style="background:${r.color}"></span>
+          ${r.name}
+        </td>
+        <td>${r.modules}</td>
+        <td>${r.time}s</td>
+        <td style="font-size:.62rem;color:var(--dim)">${r.difficulty || '—'}</td>
+        <td style="font-size:.6rem;color:${r.mode === 'MODO 2' ? '#ff9f43' : '#4fc3f7'}">
+          ${r.mode || 'MODO 1'}
+        </td>
+      </tr>
+    `).join('');
+  };
+});
+</script>
+
+</body>
+</html>
