@@ -156,14 +156,14 @@ try { ranking = JSON.parse(localStorage.getItem('astroRanking') || '[]'); } catc
    }
  
    // Planeta: defina os caminhos reais das imagens do seu projeto
-   const IMG_JUPITER = 'jupiter.png';
-   const IMG_SATURNO = 'saturno.png';
-   const IMG_TERRA   = 'terra.png';
-   const IMG_MARTE   = 'marte.png';
-   const IMG_URANO   = 'urano.png';
-   const IMG_LUA     = 'lua.png';
-   const IMG_SOL     = 'sol.png';
- 
+  const IMG_JUPITER = 'img/jupiter.png';
+  const IMG_SATURNO = 'img/saturno.png';
+  const IMG_TERRA   = 'img/terra.png';
+  const IMG_MARTE   = 'img/marte.png';
+  const IMG_URANO   = 'img/urano.png';
+  const IMG_LUA     = 'img/lua.png';
+  const IMG_SOL     = 'img/sol.png';
+
    const planetConfigs = [
      { src: IMG_JUPITER,  size: 90,  left: 82, top: 8,  dur: 38 },
      { src: IMG_SATURNO,  size: 75,  left: 5,  top: 18, dur: 44 },
@@ -186,7 +186,7 @@ try { ranking = JSON.parse(localStorage.getItem('astroRanking') || '[]'); } catc
    });
  
    // Cometa
-   const IMG_COMETA = 'cometa.png';
+   const IMG_COMETA = 'img/cometa.png';
    const spawnComet = () => {
      const el = document.createElement('img');
      el.className = 'bg-comet';
